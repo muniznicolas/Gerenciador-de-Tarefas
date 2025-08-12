@@ -17,15 +17,18 @@ const STORAGE_KEY = 'todo-list-v1';
 let tasks = load();
 
 let currentFilter = 'todas'; // 'todas' | 'pendentes' | 'concluidas'
+let sortBy = 'created_desc'; // 'created_desc' | 'created_asc' | 'prio_desc' | 'prio_asc'
 
 // Estrutura da tarefa:
 // { id, title, description, priority: 'alta'|'media'|'baixa', createdAt: ISO, done: bool }
 
 // ==============================
-/* Inicialização */
+// Inicialização
+// ==============================
 document.addEventListener('DOMContentLoaded', () => {
   bindForm();
   bindFilters();
+  bindSorting();
   render();
 });
 
@@ -60,7 +63,7 @@ function bindForm() {
     }
 
     const newTask = {
-      id: crypto.randomUUID(),
+      id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()),
       title,
       description,
       priority, // 'alta' | 'media' | 'baixa'
@@ -99,6 +102,40 @@ function applyFilter(list) {
 }
 
 // ==============================
+// Ordenação
+// ==============================
+function bindSorting() {
+  const sel = $('#sortBy');
+  if (!sel) return; // caso o select não exista no HTML
+  sel.addEventListener('change', (e) => {
+    sortBy = e.target.value;
+    render();
+  });
+}
+
+function priorityRank(p) {
+  // quanto maior o número, maior a prioridade
+  const map = { alta: 3, media: 2, baixa: 1 };
+  return map[p] || 0;
+}
+
+function applySort(list) {
+  const copy = [...list];
+  switch (sortBy) {
+    case 'created_asc':
+      return copy.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    case 'created_desc':
+      return copy.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    case 'prio_desc': // Alta → Baixa
+      return copy.sort((a, b) => priorityRank(b.priority) - priorityRank(a.priority));
+    case 'prio_asc': // Baixa → Alta
+      return copy.sort((a, b) => priorityRank(a.priority) - priorityRank(b.priority));
+    default:
+      return copy;
+  }
+}
+
+// ==============================
 // Renderização
 // ==============================
 function render() {
@@ -106,14 +143,15 @@ function render() {
   listEl.innerHTML = '';
 
   const filtered = applyFilter(tasks);
+  const ordered = applySort(filtered);
 
-  if (filtered.length === 0) {
+  if (ordered.length === 0) {
     $('#emptyState').style.display = 'block';
   } else {
     $('#emptyState').style.display = 'none';
   }
 
-  filtered.forEach(task => {
+  ordered.forEach(task => {
     listEl.appendChild(renderItem(task));
   });
 
@@ -216,6 +254,7 @@ function toggleDone(id, checked) {
 }
 
 function deleteTask(id) {
+  if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
   tasks = tasks.filter(t => t.id !== id);
   save();
   render();

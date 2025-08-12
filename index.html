@@ -44,14 +44,27 @@
       </form>
     </section>
 
-    <!-- Controles: filtros + contador -->
+    <!-- Controles: filtros + ordenação + contador -->
     <section class="controls">
+      <!-- Filtros -->
       <div class="filters" role="tablist" aria-label="Filtro de tarefas">
         <button class="chip active" data-filter="todas" role="tab" aria-selected="true">Todas</button>
         <button class="chip" data-filter="pendentes" role="tab" aria-selected="false">Pendentes</button>
         <button class="chip" data-filter="concluidas" role="tab" aria-selected="false">Concluídas</button>
       </div>
 
+      <!-- Ordenação -->
+      <div class="sort">
+        <label for="sortBy">Ordenar por:</label>
+        <select id="sortBy">
+          <option value="created_desc" selected>Mais recentes</option>
+          <option value="created_asc">Mais antigas</option>
+          <option value="prio_desc">Prioridade (Alta → Baixa)</option>
+          <option value="prio_asc">Prioridade (Baixa → Alta)</option>
+        </select>
+      </div>
+
+      <!-- Contador -->
       <div class="counters" aria-live="polite">
         <span><strong>Total:</strong> <span id="countTotal">0</span></span>
         <span class="dot">•</span>
@@ -74,7 +87,7 @@
   </main>
 
   <footer class="container footer">
-    <small>Feito com ❤️ — Salva automaticamente no navegador</small>
+    <small>Feito por Nicolas Araujo Muniz</small>
   </footer>
 
   <!-- JS externo -->
