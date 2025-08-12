@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Minhas Tarefas</title>
+
+  <!-- CSS externo -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="container">
+    <h1>Minhas Tarefas</h1>
+    <p class="subtitle">Criar e organizar tarefas diárias</p>
+  </header>
+
+  <main class="container">
+    <!-- Formulário de criação -->
+    <section class="card">
+      <h2>Nova tarefa</h2>
+      <form id="taskForm" aria-label="Adicionar nova tarefa">
+        <div class="grid">
+          <div class="field">
+            <label for="title">Título <span class="req">*</span></label>
+            <input id="title" name="title" type="text" placeholder="Ex.: Estudar 30 minutos" required />
+          </div>
+
+          <div class="field">
+            <label for="priority">Prioridade</label>
+            <select id="priority" name="priority">
+              <option value="media" selected>Média</option>
+              <option value="alta">Alta</option>
+              <option value="baixa">Baixa</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="description">Descrição</label>
+          <textarea id="description" name="description" rows="3" placeholder="Como a tarefa deve ser feita?"></textarea>
+        </div>
+
+        <button type="submit" class="btn primary">Adicionar</button>
+      </form>
+    </section>
+
+    <!-- Controles: filtros + contador -->
+    <section class="controls">
+      <div class="filters" role="tablist" aria-label="Filtro de tarefas">
+        <button class="chip active" data-filter="todas" role="tab" aria-selected="true">Todas</button>
+        <button class="chip" data-filter="pendentes" role="tab" aria-selected="false">Pendentes</button>
+        <button class="chip" data-filter="concluidas" role="tab" aria-selected="false">Concluídas</button>
+      </div>
+
+      <div class="counters" aria-live="polite">
+        <span><strong>Total:</strong> <span id="countTotal">0</span></span>
+        <span class="dot">•</span>
+        <span><strong>Concluídas:</strong> <span id="countDone">0</span></span>
+        <span class="dot">•</span>
+        <span><strong>Pendentes:</strong> <span id="countPending">0</span></span>
+      </div>
+    </section>
+
+    <!-- Lista de tarefas -->
+    <section class="card">
+      <h2>Lista</h2>
+      <ul id="taskList" class="task-list" aria-live="polite"></ul>
+
+      <!-- Estado vazio -->
+      <div id="emptyState" class="empty">
+        <p>Nenhuma tarefa por aqui ainda. Que tal criar a primeira? ✨</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="container footer">
+    <small>Feito com ❤️ — Salva automaticamente no navegador</small>
+  </footer>
+
+  <!-- JS externo -->
+  <script src="app.js"></script>
+</body>
+</html>
