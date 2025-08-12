@@ -16,8 +16,8 @@ const formatDate = (iso) =>
 const STORAGE_KEY = 'todo-list-v1';
 let tasks = load();
 
-let currentFilter = 'pendentes'; // 'todas' | 'pendentes' | 'concluidas'
-let sortBy = 'created_desc'; // 'created_desc' | 'created_asc' | 'prio_desc' | 'prio_asc'
+let currentFilter = 'pendentes'; // 'pendentes' | 'concluidas'
+let sortBy = 'created_desc';     // 'created_desc' | 'created_asc' | 'prio_desc' | 'prio_asc'
 
 // Estrutura da tarefa:
 // { id, title, description, priority: 'alta'|'media'|'baixa', createdAt: ISO, done: bool }
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   bindForm();
   bindFilters();
   bindSorting();
-  render();
+  setFilter('pendentes'); // força estado inicial e renderiza
 });
 
 // ==============================
@@ -68,7 +68,7 @@ function bindForm() {
       description,
       priority, // 'alta' | 'media' | 'baixa'
       createdAt: new Date().toISOString(),
-      done: false
+      done: false // sempre criada como pendente
     };
     tasks.unshift(newTask);
     save();
@@ -85,19 +85,26 @@ function bindForm() {
 function bindFilters() {
   $$('.filters .chip').forEach(btn => {
     btn.addEventListener('click', () => {
-      $$('.filters .chip').forEach(b => {
-        b.classList.toggle('active', b === btn);
-        b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
-      });
-      currentFilter = btn.dataset.filter;
-      render();
+      setFilter(btn.dataset.filter);
     });
   });
 }
 
+// Garante filtro + visual dos chips sincronizados
+function setFilter(filter) {
+  currentFilter = filter;
+  $$('.filters .chip').forEach(b => {
+    const isActive = b.dataset.filter === filter;
+    b.classList.toggle('active', isActive);
+    b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+  });
+  render();
+}
+
+// Filtra com checagem estrita de concluídas
 function applyFilter(list) {
-  if (currentFilter === 'pendentes') return list.filter(t => !t.done);
-  if (currentFilter === 'concluidas') return list.filter(t => t.done);
+  if (currentFilter === 'pendentes') return list.filter(t => t.done !== true);
+  if (currentFilter === 'concluidas') return list.filter(t => t.done === true);
   return list;
 }
 
@@ -160,7 +167,7 @@ function render() {
 
 function updateCounters() {
   const total = tasks.length;
-  const done = tasks.filter(t => t.done).length;
+  const done = tasks.filter(t => t.done === true).length;
   const pending = total - done;
 
   $('#countTotal').textContent = total;
@@ -170,14 +177,14 @@ function updateCounters() {
 
 function renderItem(task) {
   const li = document.createElement('li');
-  li.className = `task ${task.done ? 'done' : ''}`;
+  li.className = `task ${task.done === true ? 'done' : ''}`;
   li.dataset.id = task.id;
 
   // Checkbox
   const checkbox = document.createElement('label');
   checkbox.className = 'checkbox';
   checkbox.innerHTML = `
-    <input type="checkbox" ${task.done ? 'checked' : ''} aria-label="Marcar tarefa como ${task.done ? 'pendente' : 'concluída'}">
+    <input type="checkbox" ${task.done === true ? 'checked' : ''} aria-label="Marcar tarefa como ${task.done === true ? 'pendente' : 'concluída'}">
     <span class="custom"></span>
   `;
 
@@ -247,7 +254,7 @@ function renderItem(task) {
 function toggleDone(id, checked) {
   const i = tasks.findIndex(t => t.id === id);
   if (i >= 0) {
-    tasks[i].done = !!checked;
+    tasks[i].done = checked === true; // força booleano estrito
     save();
     render();
   }
