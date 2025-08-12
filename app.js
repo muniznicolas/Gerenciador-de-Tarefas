@@ -16,7 +16,7 @@ const formatDate = (iso) =>
 const STORAGE_KEY = 'todo-list-v1';
 let tasks = load();
 
-let currentFilter = 'todas'; // 'todas' | 'pendentes' | 'concluidas'
+let currentFilter = 'pendentes'; // 'todas' | 'pendentes' | 'concluidas'
 let sortBy = 'created_desc'; // 'created_desc' | 'created_asc' | 'prio_desc' | 'prio_asc'
 
 // Estrutura da tarefa:
